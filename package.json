@@ -1,6 +1,7 @@
 {
   "name": "nexus-bot",
   "version": "1.0.0",
+  "type": "module",
   "description": "New bot for latest djs release",
   "main": "index.js",
   "scripts": {
