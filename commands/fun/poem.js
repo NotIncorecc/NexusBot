@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
-const { EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder ,EmbedBuilder } from "discord.js";
 
 export const data = new SlashCommandBuilder()
     .setName("poem")
