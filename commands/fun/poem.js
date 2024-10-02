@@ -13,12 +13,12 @@ export const data = new SlashCommandBuilder()
         .setDescription("Gives you a random poem")
         .addStringOption(option => 
             option
-            .setName("Genre")
+            .setName("genre")
             .setDescription("You can enter a genre if you want")
             .setRequired(false))
         .addStringOption(option =>
             option
-            .setName("Author")
+            .setName("author")
             .setDescription("Name of Author")
             .setRequired(false)))
 
