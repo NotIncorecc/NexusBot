@@ -1,4 +1,19 @@
 import { SlashCommandBuilder ,EmbedBuilder } from "discord.js";
+import axios from "axios";
+
+const apiURL = "https://poetrydb.org/";
+const getRand = (items) => {return items[Math.floor(Math.random()*items.length)]};
+const findSmallPoem = async () => { //first find the smallest poems, once found, get the lines appropriately
+    let found =0, poems;
+    while(found==0) {
+        let r = Math.floor((Math.random() * 50) + 1);
+        poems = (await axios.get(`${apiURL}linecount/${r}/title`)).data;
+        found = poems.length;
+    }
+    let rPoemTitle = ( getRand(poems) ).title;
+    let fetchedPoem = await axios.get(`${apiURL}title/${rPoemTitle}`)
+    return getRand(fetchedPoem.data);
+}
 
 export const data = new SlashCommandBuilder()
     .setName("poem")
@@ -13,7 +28,7 @@ export const data = new SlashCommandBuilder()
         .setDescription("Gives you a random poem")
         .addStringOption(option => 
             option
-            .setName("genre")
+            .setName("genre")//always use lowercase chars in name, it gives error for otherwise for some reason
             .setDescription("You can enter a genre if you want")
             .setRequired(false))
         .addStringOption(option =>
@@ -38,5 +53,29 @@ export async function execute(interaction) {
         .setTimestamp()
 
         await interaction.reply({embeds: [embed]});
+    } else if (interaction.options.getSubcommand() === "random") {
+        const poemAuthor = interaction.options.getString("author");
+        const genre = interaction.options.getString("genre");
+        if (poemAuthor && genre) {
+
+        } else if (poemAuthor) {
+
+        } else if (genre) {
+
+        } else {
+            try {
+                var poem = await findSmallPoem();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        const pEmbed = new EmbedBuilder()
+            .setColor(0x00FF99)
+            .setTitle(poem.title)
+            .setAuthor({name: poem.author})
+            .setDescription(poem.lines.join("\n"))
+            .setTimestamp()
+        
+        await interaction.reply({embeds: [pEmbed]});
     }
 }
