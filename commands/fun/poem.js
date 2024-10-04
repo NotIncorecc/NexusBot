@@ -11,7 +11,7 @@ const findSmallPoem = async () => { //first find the smallest poems, once found,
         found = poems.length;
     }
     let rPoemTitle = ( getRand(poems) ).title;
-    let fetchedPoem = await axios.get(`${apiURL}title/${rPoemTitle}`)
+    let fetchedPoem = await axios.get(`${apiURL}title/${rPoemTitle}:abs`);
     return getRand(fetchedPoem.data);
 }
 
@@ -56,18 +56,21 @@ export async function execute(interaction) {
     } else if (interaction.options.getSubcommand() === "random") {
         const poemAuthor = interaction.options.getString("author");
         const genre = interaction.options.getString("genre");
+        try {
         if (poemAuthor && genre) {
-
+            //later
         } else if (poemAuthor) {
-
+            const req = (await axios.get(`${apiURL}author/${poemAuthor}`) ).data;
+            var poem = getRand(req);
         } else if (genre) {
-
+            const req = (await axios.get(`${apiURL}ttitle/${genre}`)).data;
+            var poem = getRand(req);
         } else {
-            try {
-                var poem = await findSmallPoem();
-            } catch (error) {
-                console.log(error);
-            }
+            var poem = await findSmallPoem();
+            
+        }
+        } catch(error) {
+            console.error(error);
         }
         const pEmbed = new EmbedBuilder()
             .setColor(0x00FF99)
