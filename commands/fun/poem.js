@@ -58,19 +58,17 @@ export async function execute(interaction) {
         const genre = interaction.options.getString("genre");
         try {
         if (poemAuthor && genre) {
-            //later
+            const req = (await axios.get(`${apiURL}author/${poemAuthor}/title,author,linecount,lines`)).data;
+            const genreFilter = req.filter(poem => (poem.title).toLowerCase().includes(genre.toLowerCase()));
+            var poem = getRand(genreFilter);
         } else if (poemAuthor) {
             const req = (await axios.get(`${apiURL}author/${poemAuthor}`) ).data;
             var poem = getRand(req);
         } else if (genre) {
-            const req = (await axios.get(`${apiURL}ttitle/${genre}`)).data;
+            const req = (await axios.get(`${apiURL}title/${genre}`)).data;
             var poem = getRand(req);
         } else {
             var poem = await findSmallPoem();
-            
-        }
-        } catch(error) {
-            console.error(error);
         }
         const pEmbed = new EmbedBuilder()
             .setColor(0x00FF99)
@@ -80,5 +78,8 @@ export async function execute(interaction) {
             .setTimestamp()
         
         await interaction.reply({embeds: [pEmbed]});
+        } catch(error) {
+            console.error(error);
+        }
     }
 }
