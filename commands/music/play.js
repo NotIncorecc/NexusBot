@@ -4,7 +4,7 @@
 //voice connection
 import fs from 'node:fs';
 import path from 'node:path';
-import { joinVoiceChannel, createAudioPlayer } from "@discordjs/voice";
+import { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } from "@discordjs/voice";
 import { SlashCommandBuilder } from "discord.js";
 
 const getMp3 = () => {
@@ -13,7 +13,7 @@ const getMp3 = () => {
     for (const track of allTracks) {
         trackData.push({
             name: track.substring(0, track.length - 4).replace(/\s/g,'').toLowerCase(),
-            value: track.replace(/\s/g,'').toLowerCase()
+            value: track
         });
     }
     return trackData;
@@ -32,25 +32,35 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     const query = interaction.options.getString("query");
+    const songPath = `audio/${query}`;//problem here, getting path is not case sensitive 
     const voiceChannel = interaction.member.voice.channel;
     if (!voiceChannel) return await interaction.reply("You need to be in a voice channel to play music!");
-    return await interaction.reply(`Playing ${query} in ${voiceChannel.name}`);//for now
-/*
-    const connection = joinVoiceChannel({
-        channelId: voiceChannel.id,
-        guildId: voiceChannel.guild.id,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator
-    });
-    const player = createAudioPlayer({
-        behaviors: {
-            noSubscriber: "pause",
+
+    const audioplayer = createAudioPlayer({
+        behaviors:{
+            noSubscriber:"pause",
         },
     });
+
+    const vconnection = joinVoiceChannel({
+        channelId: voiceChannel.id,
+        guildId:voiceChannel.guild.id,
+        adapterCreator: voiceChannel.guild.voiceAdapterCreator
+    })
+
     try{
-        
-    } catch (error) {
-        console.error(error);
+        const songResource = createAudioResource(songPath);
+        audioplayer.play(songResource);
+
+        vconnection.subscribe(audioplayer);
+        audioplayer.on(AudioPlayerStatus.Idle, async () =>{
+            await interaction.reply(`Song ended leaving the channel`);
+            audioplayer.stop();
+            vconnection.destroy();
+        });
+    } catch(error) {
+        console.log(error);
     }
-*/
+    
 
 }
