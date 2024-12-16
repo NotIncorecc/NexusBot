@@ -32,10 +32,11 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     const query = interaction.options.getString("query");
-    const songPath = `audio/${query}`;//problem here, getting path is not case sensitive 
+    const songPath = `audio/${query}`; 
     const voiceChannel = interaction.member.voice.channel;
     if (!voiceChannel) return await interaction.reply("You need to be in a voice channel to play music!");
     try{
+    console.log(`Attempting to play: ${songPath}`);
     const audioplayer = createAudioPlayer({
         behaviors:{
             noSubscriber:"pause",
@@ -50,6 +51,7 @@ export async function execute(interaction) {
 
     
         const songResource = createAudioResource(songPath);
+        vconnection.subscribe(audioplayer);
         audioplayer.play(songResource);
 
         vconnection.subscribe(audioplayer);
@@ -57,6 +59,10 @@ export async function execute(interaction) {
             await interaction.reply(`Song ended leaving the channel`);
             audioplayer.stop();
             vconnection.destroy();
+        });
+
+        audioplayer.on('error', error => {
+            console.error(`Error: ${error.message} with resource ${error.resource.metadata.title}`);
         });
     } catch(error) {
         console.log(error);
