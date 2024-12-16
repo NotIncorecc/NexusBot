@@ -35,7 +35,7 @@ export async function execute(interaction) {
     const songPath = `audio/${query}`;//problem here, getting path is not case sensitive 
     const voiceChannel = interaction.member.voice.channel;
     if (!voiceChannel) return await interaction.reply("You need to be in a voice channel to play music!");
-
+    try{
     const audioplayer = createAudioPlayer({
         behaviors:{
             noSubscriber:"pause",
@@ -48,7 +48,7 @@ export async function execute(interaction) {
         adapterCreator: voiceChannel.guild.voiceAdapterCreator
     })
 
-    try{
+    
         const songResource = createAudioResource(songPath);
         audioplayer.play(songResource);
 
